@@ -4,6 +4,8 @@
 
 <p align="center"><img src="assets/brand/signalrgb-logo.svg" alt="signalrgb" height="30"></p>
 
+<p align="center"><a href="https://stargatelabs.github.io/signalrgb-lsc-battletron-bridge/"><b>Presentazione del progetto ↗</b></a> &nbsp; · &nbsp; <a href="https://github.com/StargateLabs/signalrgb-lsc-battletron-bridge/releases"><b>Download</b></a></p>
+
 # LSC Smart Connect / Battletron
 
 Un bridge locale per portare le luci Wi-Fi LSC Smart Connect e Battletron sul canvas di SignalRGB. Il protocollo LAN dell’app desktop **LSC Battletron 2.0.17** è stato ricostruito tramite reverse engineering e verificato con fixture indipendenti. Login QR dall’app LSC, streaming colori sulla LAN, gestione dei dispositivi in SignalRGB.
