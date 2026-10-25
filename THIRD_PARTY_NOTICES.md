@@ -1,0 +1,2 @@
+# Third-party notices
+Interoperability implementation based on analysis of LSC Battletron desktop app 2.0.17. Original executables, proprietary DLLs, extracted app bundles, user sessions and local keys are excluded. Rust dependency licenses remain those of their respective authors; see Cargo.lock. Product names identify supported hardware and do not imply affiliation. Original Stargate Labs source is MIT licensed.

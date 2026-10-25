@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StargateLabs · LSC Bridge</title>
+<style>
+:root{color-scheme:dark;--lime:#9fff49;--text:#f2f5ef;--muted:#929d95}
+*{box-sizing:border-box}body{margin:0;min-height:100svh;display:grid;place-items:center;padding:32px;background:#080c0a;color:var(--text);font-family:Segoe UI,Arial,sans-serif;background-image:radial-gradient(ellipse at 15% 20%,#75ff3210,transparent 50%),linear-gradient(#ffffff03 1px,transparent 1px),linear-gradient(90deg,#ffffff03 1px,transparent 1px);background-size:auto,64px 64px,64px 64px}
+.shell{width:min(1040px,100%);border:1px solid #b5ff6428;border-radius:30px;overflow:hidden;background:#101612;box-shadow:0 40px 120px #0009,0 0 80px #90ff3010;position:relative}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:22px 30px;border-bottom:1px solid #ffffff0c;background:#101612}
+.brand{display:flex;align-items:center;gap:12px;font-size:17px;font-weight:650;letter-spacing:.2px}.mark{width:30px;height:30px;border:1px solid #aaff5250;border-radius:9px;display:grid;place-items:center;background:#aaff520a;color:var(--lime)}.mark svg{width:19px;height:19px}.brand span{font-weight:350;color:#bac5ba}.tag{font:10px Consolas,monospace;letter-spacing:2px;color:#839480}
+.layout{display:grid;grid-template-columns:1fr 440px;min-height:570px}.visual{position:relative;display:flex;flex-direction:column;justify-content:space-between;padding:38px;isolation:isolate;overflow:hidden;background:#020503}.visual:before{content:"";position:absolute;inset:0;z-index:-2;background:url('data:image/jpeg;base64,__BRAND_IMAGE__') center 24%/contain no-repeat;opacity:.72}.visual:after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,#02050335 5%,transparent 35%,#030905 88%)}
+.eyebrow{font:10px Consolas,monospace;text-transform:uppercase;letter-spacing:2.5px;color:#a9b7aa;display:flex;align-items:center;gap:9px}.dot{width:6px;height:6px;border-radius:50%;background:var(--lime);box-shadow:0 0 12px #9fff4970}.visual h1{font-size:48px;font-weight:450;letter-spacing:-2.4px;line-height:1.04;margin:0 0 18px;max-width:360px}.visual h1 em{font-style:normal;color:var(--lime)}.visual p{font-size:13px;color:#a6b3a7;line-height:1.7;max-width:310px;margin:0}.features{display:flex;gap:9px;margin-top:24px;flex-wrap:wrap}.features span{border:1px solid #ffffff20;border-radius:6px;padding:7px 9px;font:9px Consolas,monospace;letter-spacing:1px;color:#c2cfc1;background:#08100980}
+.login{padding:35px 38px 29px;background:linear-gradient(145deg,#172018,#101612)}.step{font:10px Consolas,monospace;letter-spacing:1.8px;color:var(--lime);margin-bottom:16px}.login h2{font-size:27px;font-weight:500;letter-spacing:-.8px;margin:0 0 10px}.intro{font-size:13px;line-height:1.65;color:var(--muted);margin:0 0 23px}.qr-wrap{width:228px;margin:0 auto 19px;padding:10px;background:#fff;border-radius:18px;box-shadow:0 0 0 6px #aaff5206,0 14px 36px #0004}.qr-wrap>svg{display:block;width:100%;height:auto;border-radius:9px}.waiting{display:flex;align-items:center;justify-content:center;gap:8px;font:10px Consolas,monospace;color:#c8d6c6;letter-spacing:.5px}.pulse{width:6px;height:6px;border-radius:50%;background:var(--lime);animation:breathe 2s ease-in-out infinite}@keyframes breathe{50%{opacity:.3;box-shadow:0 0 10px var(--lime)}}.instructions{list-style:none;padding:20px 0 0;margin:20px 0 0;border-top:1px solid #ffffff0c;display:grid;gap:12px}.instructions li{display:flex;gap:11px;font-size:12px;line-height:1.5;color:#aab6a9}.num{flex:0 0 19px;height:19px;border:1px solid #ffffff20;border-radius:6px;display:grid;place-items:center;font:9px Consolas,monospace;color:var(--lime)}.instructions strong{color:#e3eae0;font-weight:500}
+.footer{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:15px 30px;border-top:1px solid #ffffff0c;font:9px Consolas,monospace;letter-spacing:1px;color:#768774}.footer b{font-weight:400;color:#adbea7}.footer .line{width:35px;height:2px;background:var(--lime);box-shadow:0 0 12px #9fff4940;margin-right:10px;display:inline-block;vertical-align:middle}
+@media(max-width:760px){body{padding:16px}.layout{grid-template-columns:1fr}.visual{min-height:290px;padding:26px}.visual h1{font-size:36px}.visual:before{background-size:contain;background-position:center 35%}.visual p,.features{display:none}.login{padding:28px}.topbar{padding:18px 22px}.tag{display:none}.footer{padding:16px 22px;font-size:8px;letter-spacing:.4px;flex-wrap:wrap}}
+@media(prefers-reduced-motion:reduce){.pulse{animation:none}}
+@media(max-width:380px){body{padding:10px}.topbar{padding:16px}.brand{font-size:14px;gap:6px}.visual,.login{padding:20px}.visual h1{font-size:32px}.login h2{font-size:24px}.qr-wrap{width:min(228px,100%)}.footer{padding:16px;letter-spacing:0}}
+</style>
+</head>
+<body>
+<main class="shell">
+  <header class="topbar">
+    <div class="brand"><div class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2 21 7v10l-9 5-9-5V7Z"/><path d="m7 15 5-9 5 9M9 12h6"/></svg></div>STARGATE<span>LABS</span></div>
+    <div class="tag">SIGNALRGB / LSC BRIDGE</div>
+  </header>
+  <div class="layout">
+    <section class="visual" aria-label="StargateLabs">
+      <div class="eyebrow"><span class="dot"></span>Illuminazione connessa</div>
+      <div><h1>Il tuo spazio.<br>La tua <em>luce.</em></h1><p>Le luci BattleTron e LSC entrano nel tuo universo SignalRGB.</p><div class="features"><span>4 ZONE COLORE</span><span>CONTROLLO LAN</span><span>SIGNALRGB</span></div></div>
+    </section>
+    <section class="login" aria-labelledby="login-title">
+      <div class="step">01 / COLLEGA IL TUO ACCOUNT</div>
+      <h2 id="login-title">Accendi la connessione.</h2>
+      <p class="intro">Apri <strong>LSC Smart Connect</strong> sul telefono.<br>Vai su Io / Profilo e tocca lo scanner in alto a destra.</p>
+      <div class="qr-wrap" role="img" aria-label="Codice QR per il login all’account luci">__QR_SVG__</div>
+      <div class="waiting" role="status"><span class="pulse" aria-hidden="true"></span>IN ATTESA DELLA TUA SCANSIONE</div>
+      <ol class="instructions"><li><span class="num">1</span><span>Usa lo <strong>scanner dentro LSC Smart Connect</strong> per leggere questo codice.</span></li><li><span class="num">2</span><span><strong>Conferma l’accesso</strong> sul telefono.<br>Il bridge continua nel terminale.</span></li></ol>
+    </section>
+  </div>
+  <footer class="footer"><span><span class="line"></span>STARGATELABS <b>/ CONNECTED LIGHTING</b></span><span>QR VALIDO 2 MIN · MANTIENI IL BRIDGE APERTO</span></footer>
+</main>
+</body>
+</html>

@@ -1,0 +1,7 @@
+target/
+*.log
+*.pdb
+config.json*
+lan-sessions.json*
+node_modules/
+__pycache__/

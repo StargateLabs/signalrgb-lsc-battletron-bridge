@@ -1,0 +1,26 @@
+[package]
+name = "lscbridge"
+version = "1.0.0"
+edition = "2021"
+description = "LSC Battletron LAN bridge for SignalRGB (reimplements the LSC Battletron 2.0.17 UDP protocol)"
+
+[dependencies]
+aes-gcm = "0.10"
+hmac = "0.12"
+sha2 = "0.10"
+md-5 = "0.10"
+hex = "0.4"
+crc32fast = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+native-tls = "0.2"
+rand = "0.8"
+base64 = "0.22"
+if-addrs = "0.13"
+aes = "0.8"
+cipher = "0.4"
+qr2term = "0.3"
+socket2 = { version = "0.5", features = ["all"] }
+
+[profile.release]
+opt-level = 2
