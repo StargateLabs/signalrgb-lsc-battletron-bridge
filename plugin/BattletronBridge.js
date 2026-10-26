@@ -267,9 +267,12 @@ export function Render() {
   lastFrameTime = now;
 
   const leds = [];
+  const mapped = lightingMode !== "Colore fisso" && typeof device.getColors === "function"
+    ? device.getColors("Inline", "RGB") : null;
   const fixed = lightingMode === "Colore fisso" ? normalizeColor(device.createColorArray(forcedColor, 1, "Inline")) : null;
   for (let i = 0; i < 4; i++) {
-    leds.push(fixed || normalizeColor(device.color(i, 0)));
+    leds.push(fixed || normalizeColor(mapped && mapped.length >= 12
+      ? [mapped[i*3], mapped[i*3+1], mapped[i*3+2]] : device.color(i, 0)));
   }
   const colors = JSON.stringify(leds);
   // Keepalive sotto il watchdog di due secondi, senza duplicare ogni frame statico.

@@ -18,6 +18,7 @@ pub struct Inner {
     pub black_since: HashMap<String, Instant>,
     pub pending_power: HashMap<String, bool>,
     pub power_requested: HashMap<String, bool>,
+    pub power_confirmed: HashMap<String, bool>,
     pub renegotiate: HashSet<String>,
     /// dispositivi risultati online (devId)
     pub online: Vec<String>,
@@ -43,6 +44,7 @@ impl SharedState {
             black_since: HashMap::new(),
             pending_power: HashMap::new(),
             power_requested: HashMap::new(),
+            power_confirmed: HashMap::new(),
             renegotiate: HashSet::new(),
             online: Vec::new(),
             running_ok: true,
@@ -72,6 +74,7 @@ impl Inner {
         // Lo stream LAN riaccende il dispositivo; un ON cloud tardivo ripristina
         // il vecchio colore. Annulla gli OFF accodati quando riprende un colore.
         if on {
+            self.power_confirmed.remove(id);
             self.power_requested.insert(id.into(), true);
             self.pending_power.remove(id);
             return;

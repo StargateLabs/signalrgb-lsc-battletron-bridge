@@ -121,7 +121,13 @@ fn serve_power(state: SharedState, stop: Arc<AtomicBool>) {
             match result {
                 Ok(()) => {
                     retry.remove(&id);
-                    if state.read().power_requested.get(&id) == Some(&on) {
+                    let mut st = state.write();
+                    if st.power_requested.get(&id) == Some(&on) {
+                        st.power_confirmed.insert(id.clone(), on);
+                        if !on && st.latest.get(&id) == Some(&[[0; 3]; 4]) {
+                            st.latest.remove(&id);
+                            st.release_after_send.remove(&id);
+                        }
                         eprintln!("lscbridge: DP20 {} confermato per {}", if on {"on"} else {"off"}, id);
                     }
                 }
@@ -279,8 +285,8 @@ fn execute_request(req: Request, state: &SharedState) -> String {
                                 } else {
                                     st.frame_received_at.insert(id.clone(), Instant::now());
                                 }
-                                // Once DP20 OFF is requested, do not wake it again with LAN keepalives.
-                                if arr == [[0; 3]; 4] && st.power_requested.get(&id) == Some(&false) {
+                                // Keep sending black until DP20 OFF is actually confirmed.
+                                if arr == [[0; 3]; 4] && st.power_confirmed.get(&id) == Some(&false) {
                                     st.latest.remove(&id);
                                 } else {
                                     st.latest.insert(id, arr);
@@ -361,12 +367,16 @@ mod tests {
         state.write().pending_power.clear();
         send([0;3]);
         assert!(state.read().pending_power.is_empty(), "OFF non ripetuto a ogni keepalive");
-        assert!(!state.read().latest.contains_key("dev"), "nessun keepalive LAN dopo OFF");
+        assert_eq!(state.read().latest.get("dev"), Some(&[[0;3];4]), "nero mantenuto finche OFF non e confermato");
+        state.write().power_confirmed.insert("dev".into(), false);
+        send([0;3]);
+        assert!(!state.read().latest.contains_key("dev"), "nessun keepalive LAN dopo OFF confermato");
         state.write().pending_power.insert("dev".into(),false);
         send([0,255,0]);
         assert!(state.read().pending_power.is_empty());
         assert!(!state.read().black_since.contains_key("dev"));
         assert_eq!(state.read().power_requested.get("dev"),Some(&true));
+        assert!(!state.read().power_confirmed.contains_key("dev"));
     }
 
     fn client(port: u16) -> TcpStream {

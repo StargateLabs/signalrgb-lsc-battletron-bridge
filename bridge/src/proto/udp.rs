@@ -540,7 +540,9 @@ impl UdpRuntime {
                                 if st.release_after_send.contains(&device.dev_id)
                                     && st.latest.get(&device.dev_id) == Some(&[[0; 3]; 4])
                                     && value == color::frame_to_values(&[[0; 3]; 4], &config) {
-                                    st.latest.remove(&device.dev_id);
+                                    if st.power_confirmed.get(&device.dev_id) == Some(&false) {
+                                        st.latest.remove(&device.dev_id);
+                                    }
                                     st.release_after_send.remove(&device.dev_id);
                                     st.frame_received_at.remove(&device.dev_id);
                                 }
@@ -1035,6 +1037,10 @@ mod tests {
         assert_eq!(value, color::frame_to_values(&[[0; 3]; 4], &cfg));
         assert!(rt.state.read().latest.contains_key(id), "nero resta fino a send_to riuscito");
         rt.handle_sent(&fr, None, Instant::now());
+        assert!(rt.state.read().latest.contains_key(id), "nero mantenuto prima di conferma DP20");
+        rt.state.write().power_confirmed.insert(id.into(), false);
+        rt.state.write().release_after_send.insert(id.into());
+        rt.handle_sent(&fr, None, Instant::now());
         assert!(!rt.state.read().latest.contains_key(id));
         assert!(rt.build_pending_frame().is_none());
     }
@@ -1049,6 +1055,10 @@ mod tests {
         rt.state.write().frame_received_at.insert(id.into(), Instant::now() - Duration::from_secs(3));
         let black = rt.build_pending_frame().unwrap();
         assert!(rt.state.read().latest.contains_key(id));
+        rt.handle_sent(&black, None, Instant::now());
+        assert!(rt.state.read().latest.contains_key(id), "nero mantenuto durante retry cloud");
+        rt.state.write().power_confirmed.insert(id.into(), false);
+        rt.state.write().release_after_send.insert(id.into());
         rt.handle_sent(&black, None, Instant::now());
         assert!(!rt.state.read().latest.contains_key(id));
         assert!(rt.build_pending_frame().is_none());
