@@ -201,9 +201,10 @@ function endpointOf() {
   return { host: host || "127.0.0.1", port: parseInt(port) || BRIDGE_DEFAULT_PORT };
 }
 
-// registrazione eventi tollerante: "connected" (docs) con fallback "connection"
+// This UDP runtime logs unsupported aliases instead of throwing an exception.
 function onSafe(sock, names, handler) {
-  const list = Array.isArray(names) ? names : [names];
+  const list = (Array.isArray(names) ? names : [names])
+    .filter(name => ["connection", "close", "error", "message"].includes(name));
   let registered = false;
   for (const n of list) {
     try { sock.on(n, handler); registered = true; } catch (e) { /* prova il prossimo */ }

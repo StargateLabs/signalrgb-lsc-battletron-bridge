@@ -221,6 +221,19 @@ check("limite 5 FPS non invia prima di 200 ms", renderSocket.packets.length === 
 renderTime += 1;
 sandbox.Render();
 check("limite 5 FPS invia il colore corrente a 200 ms", renderSocket.packets.length === ratePackets + 1);
+sandbox.bridgeRecovery = 'Riconnetti questa luce';
+sandbox.onbridgeRecoveryChanged();
+sandbox.Render();
+check("controllo dispositivo riconnette la sola luce selezionata",
+  JSON.stringify(protocolDecode(renderSocket.packets.at(-1))) === JSON.stringify({cmd:'RECONNECT',id:'render-test'}));
+const afterRecovery = renderSocket.packets.length;
+sandbox.Render();
+check("riconnessione da impostazioni non si ripete ad ogni frame", renderSocket.packets.length === afterRecovery);
+sandbox.bridgeRecovery = 'Riconnetti tutte le luci';
+sandbox.onbridgeRecoveryChanged();
+sandbox.Render();
+check("controllo dispositivo puo riconnettere tutte le luci",
+  JSON.stringify(protocolDecode(renderSocket.packets.at(-1))) === JSON.stringify({cmd:'RECONNECT'}));
 sandbox.Shutdown(false);
 check("Shutdown rilascia controllo per spegnimento", protocolDecode(renderSocket.packets.at(-1)).cmd==='RELEASE');
 
@@ -229,5 +242,9 @@ let threw = false;
 try { protocolDecode([0, 0, 0, 99, 1, 2]); } catch (e) { threw = true; }
 check("frame incompleto rifiutato", threw);
 
+const registeredEvents=[];
+sandbox.udpEventProbe={on(name){registeredEvents.push(name);}};
+vm.runInContext('onSafe(udpEventProbe,["connected","connection","err","error","disconnected","close","message"],()=>{})',sandbox);
+check('UDP registra soltanto eventi supportati dal runtime',registeredEvents.join(',')==='connection,error,close,message');
 console.log(`\n${pass} passati, ${fail} falliti`);
 process.exit(fail ? 1 : 0);
