@@ -60,6 +60,15 @@ impl SharedState {
 }
 
 impl Inner {
+    /// Stop LAN traffic before cloud OFF: even black LAN packets can wake a light.
+    pub fn prepare_power_off(&mut self, id: &str) -> bool {
+        if self.power_requested.get(id) != Some(&false) { return false; }
+        if self.latest.get(id).is_some_and(|frame| *frame != [[0;3];4]) { return false; }
+        self.latest.remove(id);
+        self.release_after_send.remove(id);
+        true
+    }
+
     pub fn replace_config(&mut self, config: Config) {
         for device in &config.devices {
             if self.config.device(&device.dev_id)

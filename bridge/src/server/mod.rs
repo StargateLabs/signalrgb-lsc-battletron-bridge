@@ -116,6 +116,12 @@ fn serve_power(state: SharedState, stop: Arc<AtomicBool>) {
                 if gid.is_none() { gid = Some(c.first_home_id()?); }
                 // La ricerca della casa puo durare: non pubblicare OFF superato da un nuovo stream.
                 if state.read().power_requested.get(&id) != Some(&on) { return Ok(()); }
+                if !on {
+                    if !state.write().prepare_power_off(&id) { return Ok(()); }
+                    // Drain the last LAN packet before OFF; this worker never blocks Render.
+                    thread::sleep(Duration::from_millis(150));
+                    if state.read().power_requested.get(&id) != Some(&false) { return Ok(()); }
+                }
                 c.set_light_power(gid.as_ref().unwrap(), &id, on)
             })();
             match result {
@@ -137,6 +143,9 @@ fn serve_power(state: SharedState, stop: Arc<AtomicBool>) {
                     let mut st = state.write();
                     if config.session.is_some() && st.power_requested.get(&id) == Some(&on) {
                         st.pending_power.entry(id.clone()).or_insert(on);
+                        if !on && !st.power_confirmed.contains_key(&id) {
+                            st.latest.entry(id.clone()).or_insert([[0;3];4]);
+                        }
                     }
                     eprintln!("lscbridge: alimentazione {}: {}; nuovo tentativo con backoff", id, e);
                 }
@@ -286,7 +295,9 @@ fn execute_request(req: Request, state: &SharedState) -> String {
                                     st.frame_received_at.insert(id.clone(), Instant::now());
                                 }
                                 // Keep sending black until DP20 OFF is actually confirmed.
-                                if arr == [[0; 3]; 4] && st.power_confirmed.get(&id) == Some(&false) {
+                                if arr == [[0; 3]; 4] && (st.power_confirmed.get(&id) == Some(&false)
+                                    || (st.power_requested.get(&id) == Some(&false)
+                                        && !st.pending_power.contains_key(&id) && !st.latest.contains_key(&id))) {
                                     st.latest.remove(&id);
                                 } else {
                                     st.latest.insert(id, arr);
@@ -377,6 +388,23 @@ mod tests {
         assert!(!state.read().black_since.contains_key("dev"));
         assert_eq!(state.read().power_requested.get("dev"),Some(&true));
         assert!(!state.read().power_confirmed.contains_key("dev"));
+    }
+
+    #[test]
+    fn black_keepalive_cannot_restart_lan_while_cloud_off_is_in_flight() {
+        let state = SharedState::default();
+        state.write().config.devices.push(DeviceCfg::new("dev", "Light", true));
+        let send = |color| execute_request(Request {cmd:"FRAME".into(), id:Some("dev".into()), leds:Some(vec![color;4])}, &state);
+        send([0;3]);
+        state.write().black_since.insert("dev".into(), Instant::now()-Duration::from_secs(6));
+        send([0;3]);
+        state.write().pending_power.remove("dev");
+        assert!(state.write().prepare_power_off("dev"));
+        for _ in 0..5 { send([0;3]); }
+        assert!(!state.read().latest.contains_key("dev"), "no LAN wake-up during OFF");
+        send([0,255,0]);
+        assert_eq!(state.read().latest.get("dev"),Some(&[[0,255,0];4]));
+        assert!(!state.write().prepare_power_off("dev"), "stale OFF cancelled on resume");
     }
 
     fn client(port: u16) -> TcpStream {
