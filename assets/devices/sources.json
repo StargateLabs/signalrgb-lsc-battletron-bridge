@@ -1,0 +1,32 @@
+[
+  {
+    "model": "ball-light-3202652",
+    "url": "https://action.com/hostedassets/CMSArticleImages/85/18/3202652_8712879158936-111_01_20231026151213.png?quality=100&width=1200",
+    "file": "plugin\\assets\\battletron\\ball-light-3202652.png",
+    "bytes": 576989
+  },
+  {
+    "model": "monitor-strip-3206527",
+    "url": "https://action.com/hostedassets/CMSArticleImages/23/94/3206527_8712879162124-111_01_20240819152010.png?quality=100&width=1368",
+    "file": "plugin\\assets\\battletron\\monitor-strip-3206527.png",
+    "bytes": 697168
+  },
+  {
+    "model": "light-bar-3207958",
+    "url": "https://asset.action.com/image/upload/t_digital_product_image/w_1920/3207958_8712879162735-111_01_vvxp1g.webp",
+    "file": "plugin\\assets\\battletron\\light-bar-3207958.webp",
+    "bytes": 115050
+  },
+  {
+    "model": "mousepad-xxl-3202653",
+    "url": "https://action.com/hostedassets/CMSArticleImages/84/03/3202653_8712879158943-111_01_20240829085019.png?quality=75&width=1368",
+    "file": "plugin\\assets\\battletron\\mousepad-xxl-3202653.png",
+    "bytes": 333090
+  },
+  {
+    "model": "desk-strip-3m-3206528",
+    "url": "https://action.com/hostedassets/CMSArticleImages/51/53/3206528_8712879162131-111_01.png?quality=75&width=750",
+    "file": "plugin\\assets\\battletron\\desk-strip-3m-3206528.png",
+    "bytes": 247152
+  }
+]

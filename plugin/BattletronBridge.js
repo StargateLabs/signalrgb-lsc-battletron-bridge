@@ -15,6 +15,17 @@ export function Publisher() { return "Personal"; }
 export function DefaultComponentBrand() { return "LSC"; }
 export function Type() { return "network"; }
 export function SubdeviceController() { return false; }
+export function ImageUrl() {
+  if (typeof controller === "undefined") return "";
+  const name = String(controller.name || "").toLowerCase();
+  const base = "https://raw.githubusercontent.com/StargateLabs/signalrgb-lsc-battletron-bridge/main/assets/devices/";
+  if (/ball/.test(name)) return base + "ball-light-3202652.png";
+  if (/mousepad|mouse.?pad|pad dark/.test(name)) return base + "mousepad-xxl-3202653.png";
+  if (/light.?bar|barra/.test(name)) return base + "light-bar-3207958.webp";
+  if (/monitor/.test(name)) return base + "monitor-strip-3206527.png";
+  if (/desk|desktop|banco/.test(name)) return base + "desk-strip-3m-3206528.png";
+  return "";
+}
 
 // 4 LED sul canvas = 4 zone colore del dispositivo (come i CL2..CL5 di Chroma).
 export function Size() { return [4, 1]; }
@@ -29,6 +40,14 @@ const BACKOFF_MAX_MS = 15000;
 
 export function ControllableParameters() {
   return [
+    {
+      "property": "bridgeRecovery",
+      "group": "settings",
+      "label": "Recupero LAN (torna su Riposo per ripetere)",
+      "type": "combobox",
+      "values": ["Riposo", "Riconnetti questa luce", "Riconnetti tutte le luci"],
+      "default": "Riposo"
+    },
     {
       "property": "bridgeHost",
       "group": "settings",
@@ -100,6 +119,13 @@ let backoffMs = BACKOFF_MIN_MS;
 let nextTryAt = 0;
 let framesSent = 0;
 let connected = false;
+let pendingRecovery = null;
+
+export function onbridgeRecoveryChanged() {
+  if (typeof bridgeRecovery === "undefined" || bridgeRecovery === "Riposo") return;
+  pendingRecovery = bridgeRecovery === "Riconnetti tutte le luci"
+    ? { cmd: "RECONNECT" } : { cmd: "RECONNECT", id: bridgeId };
+}
 
 function log(msg) {
   device.log(msg, { toFile: true });
@@ -222,6 +248,14 @@ export function Render() {
   if (!connected || !socket || socket.state !== socket.ConnectedState) {
     connect();
     return;
+  }
+  if (pendingRecovery) {
+    try {
+      if (socket.send(protocolEncode(pendingRecovery)) === -1) return;
+      log("Riconnessione LAN richiesta: " + (pendingRecovery.id || "tutte le luci") +
+        "; servizio locale richiesto su porta 21444");
+      pendingRecovery = null;
+    } catch (e) { log("Riconnessione LAN non inviata: " + e.message); return; }
   }
   const now = Date.now();
   let rate = 30;
